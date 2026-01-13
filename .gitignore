@@ -1,0 +1,8 @@
+# Ignore only heavy / derivative folders
+tmp/
+torch/
+weights_libreface/
+
+# Ignore OS + Jupyter noise
+.DS_Store
+.ipynb_checkpoints/
