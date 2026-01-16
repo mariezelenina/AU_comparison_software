@@ -1,95 +1,92 @@
 #!/bin/bash
+# Usage: bash run_libreface_folders.sh folder1 folder2 folder3 ...
+
 # this will make the code exit fast if something is wrong (so that we don't waste time)
 # -e: stop on any error; -u: stop on undefined variables; -o pipefail: stop on hidden pipeline failures
 set -euo pipefail
  
-# paths to where data is and where to save it - obviously change it to where you store the data (or to path on server)
- 
+# ways to specify paths to where data is and where to save it
+
+# option 1: manually, for random testing vids:
 #path_to_inputfiles="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/mydata/random_10_vids_1"
 #path_out="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/outputs/libreface/experiments"
 
-# coded to take them from command line
-# TODO code them for default, after I decide whether to access files locally or on the server
+# option 2: coded to take them from command line
+# path_to_inputfiles="$1"
+# path_out="$2"
 
-path_to_inputfiles="$1"
-path_out="$2"
-
-# check if input dir  exists
-if [[ ! -d "$path_to_inputfiles" ]]; then
-  echo "Input directory $input_dir does not exist!"
-  exit 1
-fi
+# option 3 - FINAL TO MAKE EVERYTHING RUN - specify paths on server (in) and local temp folder (out)
+input_root="/Volumes/Shares/NCCIH/LYA/LYA_Lab/FEX_Substudy1/BIDS_dataset/derivatives/video/heat/Non_EMG"
+path_out="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/outputs/libreface/temp_outputs_to_rsync"
 
 # create out folder if it doesn't exist already
 mkdir -p "$path_out"
-
-# this will make the code exit fast if something is wrong (so that we don't waste time)
-# -e: stop on any error; -u: stop on undefined variables; -o pipefail: stop on
-
-# count how many files are in my folder 
-files=( "$path_to_inputfiles"/* )
-total=${#files[@]}
 
 # Count how many cores the laptop has. 
 # Use total cores - 2 (just to be safe on the RAM usage side). Clamp to min on 1 core (can't run on 0 or -1)
 total_cores=$(sysctl -n hw.ncpu)
 cores=$(( total_cores > 2 ? total_cores - 2 : 1 ))
 
-# START
-
-echo
-echo "START"
-echo "Found $total files to process"
-echo "Using $cores CPU cores"
-
-
-# if input dir is empty, say so and quit
-if (( total == 0 )); then
-  echo "No input files found in $path_to_inputfiles"
-  exit 1
-fi
-
-# start "timer" - to later print how much time it took to run the whole thing
+# start "timer"
 SECONDS=0
 
-# IN PARALLEL, run libreface on every file in the folder we specified above. Save all results to the dir in path_out
+# START
+echo
+echo "START"
+echo "Using $cores CPU cores"
 
-# tutorial on GNU parallel here: https://www.gnu.org/software/parallel/
-# an alternative (simpler?) way would be to use xargs. It is simpler - it feeds arguments to the command line in parallel -
-# but it doesn't "truly" manage parallel jobs.
-# I couldn't find a way to realistically track progress with xargs (it can output what file it's working on now, but not how much stuff is left).
-# it was important for me to track progress because tasks are long, so GNU parallel it is.
-# install thorugh homebrew, brew install parallel
-
-parallel \
-  --jobs "$cores" \
-  --bar \
-  --line-buffer \
-  --halt soon,fail=1 \
-  '
+# process each folder
+for FOLDER in "$@"; do
     echo
-    echo "Starting {}"
+    echo "Processing folder: $FOLDER"
+    
+	# count how many files are in my folder 
+    shopt -s nullglob # some magic that prevents errors when no files match the  pattern
+    files=( "$FOLDER"/*.mp4 )
+    total=${#files[@]}
 
-    # figure out the name to save my output real quick
-    base=$(basename {})
-    stem="${base%.*}"
-    output_file="$path_out/output_libreface_${stem}.csv"
+    echo "Found $total mp4 video files in folder"
 
-    # actually run libreface 
-    libreface --input_path="{}" --output_path="$output_file"
+	# if input dir is empty, say so and quit
+	if (( total == 0 )); then
+	  echo "No input files found in $FOLDER - skipping"
+	  continue
+	fi
 
-    echo "Finished {}"
-    echo
+	# make local temp folder to save output
+	folder_name=$(basename "$FOLDER")
+	local_out_dir="$path_out/$folder_name"
+	mkdir -p "$local_out_dir"
+	
+	# printf feeds all files in the folder as arguments to the parallel function
+	printf "%s\n" "${files[@]}" | parallel --jobs "$cores" --bar --halt soon,fail=1 '
+		echo
+		echo "Starting file {}"
+		FILE={} # process current file
 
-  ' ::: "${files[@]}"
+	    # figure out the name to save my output real quick
+ 	    base=$(basename "$FILE")
+	    stem="${base%.*}"
+		
+		out_name="$local_out_dir/output_libreface_${stem}.csv"
 
+		# actually run libreface
+		libreface --input_path="$FILE" --output_path="$out_name"
+
+		# file processed 
+		echo; echo "Processed file $FILE"
+		'
+
+	# done with this folder
+	echo; echo "Processed all files in folder $FOLDER!"
+
+	# count how many files have been processed
+	out_files=( "$path_out/$folder_name"/output_libreface_*.csv )
+	out_total=${#out_files[@]}
+	echo "Output folder has $out_total files. Input folder had $total videos."
+done 
 
 echo; echo "ALL DONE"; echo
-
-# count how many files have been processed
-out_files=( "$path_out"/output_libreface_*.csv )
-out_total=${#out_files[@]}
-echo "Output folder has $out_total files. Input folder had $total videos."
 
 # print how much time it took
 echo
