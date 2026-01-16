@@ -56,6 +56,7 @@ for FOLDER in "$@"; do
 	# make local temp folder to save output
 	folder_name=$(basename "$FOLDER")
 	local_out_dir="$path_out/$folder_name"
+	export local_out_dir 
 	mkdir -p "$local_out_dir"
 	
 	# printf feeds all files in the folder as arguments to the parallel function
