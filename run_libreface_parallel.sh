@@ -1,19 +1,30 @@
 #!/bin/bash
-
+# this will make the code exit fast if something is wrong (so that we don't waste time)
+# -e: stop on any error; -u: stop on undefined variables; -o pipefail: stop on hidden pipeline failures
+set -euo pipefail
+ 
 # paths to where data is and where to save it - obviously change it to where you store the data (or to path on server)
-path_to_inputfiles="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/mydata/random_10_vids"
-path_out="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/outputs/libreface/experiments"
+ 
+#path_to_inputfiles="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/mydata/random_10_vids_1"
+#path_out="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/outputs/libreface/experiments"
 
-# make the output path usable within the parallelization
-export path_out
+# coded to take them from command line
+# TODO code them for default, after I decide whether to access files locally or on the server
+
+path_to_inputfiles="$1"
+path_out="$2"
+
+# check if input dir  exists
+if [[ ! -d "$path_to_inputfiles" ]]; then
+  echo "Input directory $input_dir does not exist!"
+  exit 1
+fi
 
 # create out folder if it doesn't exist already
 mkdir -p "$path_out"
 
 # this will make the code exit fast if something is wrong (so that we don't waste time)
-# -e: stop on any error; -u: stop on undefined variables; -o pipefail: stop on hidden pipeline failures
-set -euo pipefail
-
+# -e: stop on any error; -u: stop on undefined variables; -o pipefail: stop on
 
 # count how many files are in my folder 
 files=( "$path_to_inputfiles"/* )
