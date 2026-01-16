@@ -18,6 +18,7 @@ set -euo pipefail
 # option 3 - FINAL TO MAKE EVERYTHING RUN - specify paths on server (in) and local temp folder (out)
 input_root="/Volumes/Shares/NCCIH/LYA/LYA_Lab/FEX_Substudy1/BIDS_dataset/derivatives/video/heat/Non_EMG"
 path_out="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/outputs/libreface/temp_outputs_to_rsync"
+export path_out
 
 # create out folder if it doesn't exist already
 mkdir -p "$path_out"
@@ -37,13 +38,14 @@ echo "Using $cores CPU cores"
 
 # process each folder
 for FOLDER in "$@"; do
-    echo
-    echo "Processing folder: $FOLDER"
+    echo; echo; echo; echo
+    echo "PROCESSING FOLDER: $FOLDER"
     
 	# count how many files are in my folder 
     shopt -s nullglob # some magic that prevents errors when no files match the  pattern
     files=( "$FOLDER"/*.mp4 )
     total=${#files[@]}
+    shopt -u nullglob
 
     echo "Found $total mp4 video files in folder"
 
@@ -63,7 +65,7 @@ for FOLDER in "$@"; do
 	printf "%s\n" "${files[@]}" | parallel --jobs "$cores" --bar --halt soon,fail=1 '
 		echo
 		echo "Starting file {}"
-		FILE={} # process current file
+		FILE="{}" # process current file
 
 	    # figure out the name to save my output real quick
  	    base=$(basename "$FILE")
@@ -72,7 +74,7 @@ for FOLDER in "$@"; do
 		out_name="$local_out_dir/output_libreface_${stem}.csv"
 
 		# actually run libreface
-		libreface --input_path="$FILE" --output_path="$out_name"
+		libreface --input_path="$FILE" --output_path="$out_name" --temp="$path_out"
 
 		# file processed 
 		echo; echo "Processed file $FILE"
@@ -84,7 +86,7 @@ for FOLDER in "$@"; do
 	# count how many files have been processed
 	out_files=( "$path_out/$folder_name"/output_libreface_*.csv )
 	out_total=${#out_files[@]}
-	echo "Output folder has $out_total files. Input folder had $total videos."
+	echo; echo "OUTPUT FOLDER HAS $out_total FILES. INPUT FOLDER HAD  $total VIDEOS."
 done 
 
 echo; echo "ALL DONE"; echo
