@@ -18,10 +18,13 @@ set -euo pipefail
 # option 3 - FINAL TO MAKE EVERYTHING RUN - specify paths on server (in) and local temp folder (out)
 input_root="/Volumes/Shares/NCCIH/LYA/LYA_Lab/FEX_Substudy1/BIDS_dataset/derivatives/video/heat/Non_EMG"
 path_out="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/outputs/libreface/temp_outputs_to_rsync"
+path_temp="$path_out/temp"
 export path_out
+export path_temp
 
 # create out folder if it doesn't exist already
 mkdir -p "$path_out"
+mkdir -p "$path_temp"
 
 # Count how many cores the laptop has. 
 # Use total cores - 2 (just to be safe on the RAM usage side). Clamp to min on 1 core (can't run on 0 or -1)
@@ -30,6 +33,7 @@ cores=$(( total_cores > 2 ? total_cores - 2 : 1 ))
 
 # start "timer"
 SECONDS=0
+start_time=$(date '+%Y-%m-%d %H:%M:%S')
 
 # START
 echo
@@ -74,7 +78,7 @@ for FOLDER in "$@"; do
 		out_name="$local_out_dir/output_libreface_${stem}.csv"
 
 		# actually run libreface
-		libreface --input_path="$FILE" --output_path="$out_name" --temp="$path_out"
+		libreface --input_path="$FILE" --output_path="$out_name" --temp="$path_temp"
 
 		# file processed 
 		echo; echo "Processed file $FILE"
@@ -98,3 +102,8 @@ printf "Total runtime: %02dh:%02dm:%02ds\n" \
   $((elapsed/3600)) \
   $((elapsed%3600/60)) \
   $((elapsed%60))
+
+# also print when exactly it finished
+echo
+echo "Started at: $start_time"
+echo "Finished at: $(date '+%Y-%m-%d %H:%M:%S')"
