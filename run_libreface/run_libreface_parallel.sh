@@ -29,7 +29,9 @@ mkdir -p "$path_temp"
 # Count how many cores the laptop has. 
 # Use total cores - 2 (just to be safe on the RAM usage side). Clamp to min on 1 core (can't run on 0 or -1)
 total_cores=$(sysctl -n hw.ncpu)
-cores=$(( total_cores > 2 ? total_cores - 2 : 1 ))
+cores=$(( total_cores / 2 ))
+# make sure at least 1 core is used
+cores=$(( cores < 1 ? 1 : cores ))
 
 # start "timer"
 SECONDS=0
