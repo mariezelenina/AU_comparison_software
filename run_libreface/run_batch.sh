@@ -28,17 +28,33 @@ if (( START < 1 || END < START )); then
   exit 1
 fi
 
+# how many folders in batch
+BATCH_SIZE=$(( END - START + 1 ))
+
+# add selected folders to array
+mapfile -t BATCH_FOLDERS < <(sed -n "${START},${END}p" "$FOLDER_LIST")
+
 # 1. Run libreface script:
 echo
 echo
-echo "RUNNING FOLDERS $START TO $END FROM $FOLDER_LIST"
+echo "RUNNING $BATCH_SIZE FOLDERS $START TO $END FROM $FOLDER_LIST"
 echo "STARTED AT: $(date)"
 echo
 
-caffeinate -dimsu bash -c "
-  sed -n '${START},${END}p' '$FOLDER_LIST' \
-  | xargs bash '$SCRIPT'
-"
+caffeinate -dimsu bash -c '
+i=1
+total=$#
+
+for folder in "$@"; do
+  echo
+  echo "=============================================="
+  echo "Processing folder $i out of $total"
+  echo "Folder: $folder"
+  echo "=============================================="
+  bash "'"$SCRIPT"'" "$folder"
+  ((i++))
+done
+' bash "${BATCH_FOLDERS[@]}"
 
 echo; echo; echo "DONE WITH FOLDERS $START TO $END"
 

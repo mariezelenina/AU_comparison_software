@@ -19,6 +19,7 @@ set -euo pipefail
 input_root="/Volumes/Shares/NCCIH/LYA/LYA_Lab/FEX_Substudy1/BIDS_dataset/derivatives/video/heat/Non_EMG"
 path_out="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/outputs/libreface/temp_outputs_to_rsync"
 path_temp="$path_out/temp"
+mkdir -p "$path_temp"
 export path_out
 export path_temp
 
@@ -68,11 +69,12 @@ for FOLDER in "$@"; do
 	mkdir -p "$local_out_dir"
 	
 	# printf feeds all files in the folder as arguments to the parallel function
-	printf "%s\n" "${files[@]}" | parallel --jobs "$cores" --bar --halt soon,fail=1 '
-		echo
-		echo "Starting file {}"
+	printf "%s\n" "${files[@]}" | parallel --jobs "$cores" --bar --halt soon,fail=1  \
+	'
 		FILE="{}" # process current file
-
+		echo
+		echo "Starting file $FILE"
+		
 	    # figure out the name to save my output real quick
  	    base=$(basename "$FILE")
 	    stem="${base%.*}"
@@ -80,7 +82,7 @@ for FOLDER in "$@"; do
 		out_name="$local_out_dir/output_libreface_${stem}.csv"
 
 		# actually run libreface
-		libreface --input_path="$FILE" --output_path="$out_name" --temp="$path_temp"
+		libreface --input_path="$FILE" --output_path="$out_name" --temp="$path_temp" 
 
 		# file processed 
 		echo; echo "Processed file $FILE"
@@ -89,10 +91,14 @@ for FOLDER in "$@"; do
 	# done with this folder
 	echo; echo "Processed all files in folder $FOLDER!"
 
+	# remove temp files, to save space
+	rm -rf "$path_temp"/*
+	
 	# count how many files have been processed
 	out_files=( "$path_out/$folder_name"/output_libreface_*.csv )
 	out_total=${#out_files[@]}
 	echo; echo "OUTPUT FOLDER HAS $out_total FILES. INPUT FOLDER HAD  $total VIDEOS."
+	
 done 
 
 echo; echo "ALL DONE"; echo
