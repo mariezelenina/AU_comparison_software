@@ -1,0 +1,10 @@
+name: env_libreface_new
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9.20
+  - ffmpeg
+  - cmake
+  - jupyter
+prefix: /Users/zeleninam2/miniconda3/envs/env_libreface_new
