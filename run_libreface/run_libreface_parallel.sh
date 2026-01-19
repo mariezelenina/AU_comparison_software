@@ -93,10 +93,7 @@ for FOLDER in "$@"; do
 		frames_temp_file="$path_temp/temp_frames_${stem}.csv"
 
 		# --> total frames in the file = how many .png images are in the corresponding temp folder
-		shopt -s nullglob
-		all_png=( "$path_temp"/"$stem"/*.png )
-		frames_tot="${#all_png[@]}"
-		shopt -u nullglob
+		frames_tot=$(find "$path_temp/$stem" -maxdepth 1 -type f -name "frame_*.png" ! -name "*aligned*" | wc -l)
 
 		# --> frames processed = data rows in the output file 
 		frames_done=$(tail -n +2 "$out_name" | wc -l)
