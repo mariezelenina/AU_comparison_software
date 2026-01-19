@@ -1,5 +1,5 @@
 #!/bin/bash
-# Usage: bash run_libreface_folders.sh folder1 folder2 folder3 ...
+# Usage: bash run_libreface_parallel.sh folder1 folder2 folder3 ...
 
 # this will make the code exit fast if something is wrong (so that we don't waste time)
 # -e: stop on any error; -u: stop on undefined variables; -o pipefail: stop on hidden pipeline failures
@@ -33,6 +33,9 @@ total_cores=$(sysctl -n hw.ncpu)
 cores=$(( total_cores / 2 ))
 # make sure at least 1 core is used
 cores=$(( cores < 1 ? 1 : cores ))
+
+# csv file to keep track of frames
+frames_file="/Users/zeleninam2/Documents/1_projects/1_FACE_PAIN/proj_fex_software_comparison/outputs/libreface/frames_libreface.csv"
 
 # start "timer"
 SECONDS=0
@@ -84,10 +87,30 @@ for FOLDER in "$@"; do
 		# actually run libreface
 		libreface --input_path="$FILE" --output_path="$out_name" --temp="$path_temp" 
 
-		# file processed 
+		# temp save frames data
+		
+		# --> define path to temp frames file
+		frames_temp_file="$path_temp/temp_frames_${stem}.csv"
+
+		# --> total frames in the file = how many .png images are in the corresponding temp folder
+		shopt -s nullglob
+		all_png=( "$path_temp"/"$stem"/*.png )
+		frames_tot="${#all_png[@]}"
+		shopt -u nullglob
+
+		# --> frames processed = data rows in the output file 
+		frames_done=$(tail -n +2 "$out_name" | wc -l)
+		
+		# --> write frame info of this file into temp file
+		echo "$stem, $frames_tot, $frames_done" > "$frames_temp_file"
+
+		# file processed  
 		echo; echo "Processed file $FILE"
 		'
 
+	# concatinate all temp frames info from separate jobs (files) into master file
+	cat "$path_temp"/temp_frames_*.csv >> "$frames_file"
+	
 	# done with this folder
 	echo; echo "Processed all files in folder $FOLDER!"
 

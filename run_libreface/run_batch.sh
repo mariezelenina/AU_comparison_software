@@ -32,7 +32,10 @@ fi
 BATCH_SIZE=$(( END - START + 1 ))
 
 # add selected folders to array
-mapfile -t BATCH_FOLDERS < <(sed -n "${START},${END}p" "$FOLDER_LIST")
+BATCH_FOLDERS=()
+while IFS= read -r line; do
+  BATCH_FOLDERS+=("$line")
+done < <(sed -n "${START},${END}p" "$FOLDER_LIST")
 
 # 1. Run libreface script:
 echo
