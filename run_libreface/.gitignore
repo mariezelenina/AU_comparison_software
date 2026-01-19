@@ -1,0 +1,4 @@
+# ignore my working and log files
+all_folders.txt
+frames_libreface.csv
+mylog_libreface.txt

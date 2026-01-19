@@ -2,8 +2,9 @@
 Code for the comparison of FEX software on prediction of pain-specific Action Units
 
 # RUN PREPROCESSING OF DATA WITH VARIOUS SOFTWARE
+(assuming they are all installed - refer to their own documentation)
 
-# ---> Libreface
+## ---> Libreface
 (assumes data are in folders, one per participant, doesn't matter how many videos in each participant folder)
 
 1. Create and activate the conda environment:
@@ -23,5 +24,11 @@ echo "name, total_frames, processed_frames" > frames_libreface.csv
 
 5. Run processing in batches.
 
+simple option - no log file:
 bash run_batch.sh 1 10
 - will run all videos in folders 1 to 10
+
+option to copy all outputs into log file:
+bash run_batch.sh 1 10 2>&1 | tee -a mylog_libreface.txt
+
+
