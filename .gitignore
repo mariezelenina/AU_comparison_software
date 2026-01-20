@@ -1,8 +1,11 @@
-# Ignore only heavy / derivative folders
-tmp/
-torch/
-weights_libreface/
-
-# Ignore OS + Jupyter noise
+# main folder - noise
+.Rhistory
 .DS_Store
-.ipynb_checkpoints/
+
+# libreface: ignore working and log files
+run_libreface/.DS_Store
+run_libreface/all_folders.txt
+run_libreface/frames_libreface.csv
+run_libreface/mylog_libreface*.txt
+run_libreface/tmp
+run_libreface/weights_libreface
