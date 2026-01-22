@@ -12,9 +12,12 @@ Code for the comparison of FEX software on prediction of pain-specific Action Un
 conda env create -f env_run_libreface.yml
 conda activate env_libreface_new
 
+might also need
+conda install -c conda-forge parallel
+
 2. Make a list of all folders you have
 
-path/to/data -mindepth 1 -maxdepth 1 -type d | sort > all_folders.txt
+find path/to/data -mindepth 1 -maxdepth 1 -type d | sort > all_folders.txt
 
 3. Make a master csv to track how many frames are processed/dropped per video
 
