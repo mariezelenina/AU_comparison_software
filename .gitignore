@@ -2,6 +2,12 @@
 .Rhistory
 .DS_Store
 
+# checkpoints 
+*/.ipynb_checkpoints
+
+# all folders files
+*/all_folders*
+
 # libreface: ignore working and log files
 run_libreface/.DS_Store
 run_libreface/all_folders.txt
