@@ -9,3 +9,6 @@ run_libreface/frames_libreface.csv
 run_libreface/mylog_libreface*.txt
 run_libreface/tmp
 run_libreface/weights_libreface
+
+# pyfeat: ignore code from workshop (Code Marie downloaded from somewhere to play with)
+run_pyfeat/Pyfeat_workshop

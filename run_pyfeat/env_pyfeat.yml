@@ -1,0 +1,10 @@
+name: env_fer_pyfeat
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pytables
+  - python=3.11
+  - jupyter
+  - scipy=1.11.4
+prefix: /Users/zeleninam2/miniconda3/envs/env_fer_pyfeat

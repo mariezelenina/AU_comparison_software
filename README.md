@@ -7,6 +7,9 @@ Code for the comparison of FEX software on prediction of pain-specific Action Un
 ## ---> Libreface
 (assumes data are in folders, one per participant, doesn't matter how many videos in each participant folder)
 
+0. Installation instructions here (by software authors): https://github.com/ihp-lab/LibreFace.
+Paper: https://arxiv.org/pdf/2308.10713.
+
 1. Create and activate the conda environment:
 
 conda env create -f env_run_libreface.yml
@@ -25,13 +28,17 @@ echo "name, total_frames, processed_frames" > frames_libreface.csv
 
 4. Edit paths in all .sh files
 
-5. Run processing in batches.
+5. Run processing in batches, using a bash script.\
 
-simple option - no log file:
+(a) simple option - no log file:
 bash run_batch.sh 1 10
 - will run all videos in folders 1 to 10
 
-option to copy all outputs into log file:
+(b) option to copy all outputs into log file:
 bash run_batch.sh 1 10 2>&1 | tee -a mylog_libreface.txt
+
+## ---> PyFeat
+
+
 
 
