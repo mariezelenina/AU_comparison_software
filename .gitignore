@@ -5,6 +5,9 @@
 # checkpoints 
 */.ipynb_checkpoints
 
+# logs
+*/*.log
+
 # all folders files
 */all_folders*
 
