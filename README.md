@@ -57,10 +57,11 @@ Paper: https://arxiv.org/pdf/2308.10713.
 
 `bash run_batch.sh 1 10`
 - will run all videos in folders 1 to 10
+- calls another bash script, `run_libreface_parallel`, which used n-2 availale cores to process data
 
 (b) option to copy all outputs into log file:
 
-`bash run_batch.sh 1 10 2>&1 | tee -a mylog_libreface.txt`
+`bash run_batch.sh 1 10 2>&1 | tee -a mylog_libreface.txt` 
 
 
 ## ---> PyFeat
@@ -81,9 +82,19 @@ Paper: https://arxiv.org/pdf/2104.03509
 
 `cd run_pyfeat`
 
-2a. Do it the slow way:
+2. Run pyfeat
+
+(a) Do it the slow way:
 
 open notebook `run_pyfeat_simple.ipynb`; change paths to where to save files; change path to the file that stores paths to all folders; then run the notebook
+
+(b) Do it the fast (but more confusing) way:
+
+`bash run_batch_pyfeat.sh 1 10 svm 2>&1 | tee -a mylog_pyfeat_svm.txt`
+- will run all videos in folders 1 to 10.
+- calls another bash script, `run_pyfeat_parallel_bash.sh`, which used n-1 availale cores to process data in each folder.
+- `run_pyfeat_parallel_bash.sh` in turn calls a python script, `pyfeat_process_file.py`, which is where actual pyfeat processing happens.
+
 
 
 
