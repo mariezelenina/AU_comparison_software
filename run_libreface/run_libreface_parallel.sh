@@ -62,7 +62,7 @@ for FOLDER in "$@"; do
 	# if input dir is empty, say so and quit
 	if (( total == 0 )); then
 	  echo "No input files found in $FOLDER - skipping"
-	  continue
+	  exit 0
 	fi
 
 	# make local temp folder to save output
